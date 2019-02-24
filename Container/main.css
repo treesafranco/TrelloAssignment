@@ -1,0 +1,38 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100px;
+    margin-bottom: 20px;
+    background-color: rgb(61, 167, 107);
+}
+
+header h2 {
+    color: white;
+    text-align: center;
+    margin: 0;
+}
+
+#search {
+    margin-top: 10px;
+}
+
+#search-form {
+    border: 0;
+}
+
+@media (max-width: 480px) {
+    .app-container,
+    #app-columns,
+    .app-column {
+        width: 100%;
+    }
+}
+
+

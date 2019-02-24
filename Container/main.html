@@ -1,0 +1,267 @@
+<html>
+    <head>
+        <script src="db.js" defer/></script>
+        <script src="../Components/Columns/Column/Column.js" defer/></script>
+        <script src="../Components/Columns/Columns.js" defer></script>
+        <script src="../Components/Card/Card.js" defer></script>
+        <script src="main.js" defer></script>
+        <link rel="stylesheet" type="text/css" href="main.css">
+
+    </head>
+    <body>
+        <header>
+            <h2>Welcome to your Trello Board!</h2>
+            <div id="search">
+                <input id="search-form" type="text"></input>
+                <button id="search-col">Search</button>
+            </div>
+        </header>
+
+        <template id="container-template">
+            <style>
+                .container {
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                }
+                .positive {
+                    width: 150px; 
+                    padding: 5px; 
+                    background: #69E19C;
+                    margin-top: 10px; 
+                    box-shadow: none; 
+                    border-radius: 2px; 
+                    padding: 5px;
+                    border:none;
+                }
+
+                input.error {
+                    border-color: red;
+                }
+                .add-column-wrapper {
+                    margin: 5px 5px 0 5px;
+                }
+                @media (max-width: 480px) {
+                    .app-container,
+                    #app-columns,
+                    .app-column {
+                        width: 100%;
+                    }
+                }
+            </style>
+            <div class="container">
+                <app-columns id="app-columns"></app-columns>
+                <div class="add-column-wrapper">
+                    <div class="add-column-form">
+                        <input class="column-title" placeholder="Column title">
+                        <div>
+                        <button class="add-column positive">Add a new column</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="columns-template">
+            <style>
+            .columns {
+                display: flex;
+                align-items: baseline;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .positive {
+                width: 150px; 
+                padding: 5px; 
+                background: #69E19C;
+                margin-top: 20px; 
+                box-shadow: none; 
+                border-radius: 2px; 
+                padding: 5px;border:none;
+            }
+            @media (max-width: 480px) {
+                    .app-column{
+                        width: 100%;
+                    }
+                }
+
+            </style>
+            <div class="columns">
+            </div>
+        </template>
+
+        <template id="column-template">
+            <style>
+                .column {
+                    background: #efefef;
+                    display: flex;
+                    flex-direction: column;
+                    padding: 5px;
+                    width: 250px;
+                    margin: 5px;
+                }
+                .column-header {
+                    display: flex;
+                    justify-content: space-between;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                    margin-bottom: 10px;
+                }
+                ::slotted(input) {
+                    font-size: 20px;
+                    width: 80%;
+                    background: transparent;
+                    border:none;
+                }
+                ::slotted(input:focus) {
+                    background:white
+                }
+                button {
+                    cursor: pointer;
+                }
+                .positive {
+                    width: 150px; 
+                    padding: 5px; 
+                    background: #69E19C;
+                    margin-top: 10px; 
+                    box-shadow: none; 
+                    border-radius: 2px; 
+                    padding: 5px;border:none;
+                    outline: 0;
+                }
+                .column-remove {
+                    background: transparent;
+                    box-shadow: none; 
+                    border-radius: 2px; 
+                    border: 0;
+                    outline: 0;
+                    color:grey;
+                    cursor: pointer;
+                }
+
+                .add-card-form {
+                    margin-top: 5px;
+                }
+
+                @media (max-width: 480px) {
+                    .column {
+                        width: calc(100% - 20px);
+                    }
+                }
+                
+            </style>
+            <div class="column">
+                <div class="column-header">
+                    <slot name="column-title" class="column-modify"></slot>
+                    <button class="column-remove">X</button>
+                </div>
+                <div class="cards"></div>
+
+                <div class="add-card-wrapper">
+                    <div class="add-card-form">
+                        <input class="card-title" placeholder="Card title">
+                        <div>
+                            <button class="positive add-card">Add a New Card</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="card-template">
+            <style>
+                .card {
+                    margin-bottom: 5px;
+                    background: white;
+                    padding: 5px;
+                }
+                .card-header {
+                    display: flex;
+                    justify-content: space-between;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                }
+
+                .card-footer {
+                    margin-top: 10px;
+                }
+
+                button {
+                    background: transparent;
+                    box-shadow: none; 
+                    border-radius: 2px; 
+                    border: 0;
+                    outline: 0;
+                    cursor: pointer;
+                }
+                .button.icon {
+                    color:grey;
+                    font-size: 30px;
+                }
+                .card-footer button {
+                    border: 1px solid grey;
+                }
+
+                .card-content {
+                    display: block;
+                }
+
+                .close .card-content {
+                    display: none;
+                    -webkit-transition: all .2s ease-out;
+                    transition: all .2s ease-out;
+                }
+
+                input[type=text],
+                textArea  {
+                    width: 100%;
+                    margin-bottom: 5px;
+                }
+
+                textArea {
+                    min-height: 80px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                input[type=text]:disabled,
+                textArea:disabled  {
+                    border: none;
+                    background: transparent;
+                }
+                
+                .card-title-modify, 
+                .save-card {
+                    display: none;
+                }
+                .edit .card-title-modify,
+                .edit .save-card {
+                    display:inline-block;
+                }
+                .edit .edit-card {
+                    display: none;
+                }
+
+            </style>
+            <div class="card close">
+                <div class="card-header">
+                    <slot name="card-header"></slot>
+                    <button class='button icon expand-card'>+</button>
+                </div>
+                <div class="card-content">
+                    <div class="card-body">
+                        <input type="text" class="card-title-modify" placeholder="Enter Card title" disabled></input>
+                        <textArea class="card-desc-modify" placeholder="Enter Description" disabled></textArea>
+                    </div>
+                    <div class="card-footer">
+                        <button class="button edit-card">Edit</button>
+                        <button class="button save-card hidden">Save</button>
+                        <button class="button remove-card">Remove</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <app-container class="app-container"></app-container>
+    </body>
+</html>
