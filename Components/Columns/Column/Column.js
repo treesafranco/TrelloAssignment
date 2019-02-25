@@ -69,7 +69,8 @@ class Column extends HTMLElement {
         // add a new card
         const addCardButton = this.shadowRoot.querySelector('.add-card');
         addCardButton.addEventListener('click', (e) => {
-            const title = this.shadowRoot.querySelector('.card-title').value;
+            const titleInput = this.shadowRoot.querySelector('.card-title');
+            const title = titleInput.value;
             const description = "";
 
             let uniqueTitle = true;
@@ -81,9 +82,14 @@ class Column extends HTMLElement {
             });
             
             if(title && uniqueTitle) {
+                titleInput.classList.remove('error');
                 let data = { id: id, title: title, description: description, columnId: parseInt(this.id)}
                 _addCard(this, data);
+            } else {
+                titleInput.classList.add('error');
             }
+
+
 
         });
 
@@ -132,6 +138,13 @@ function _attachCardEventListener(self) {
 
     self.shadowRoot.addEventListener('refreshList', (e) => {
         _fetchCards(self);
+    })
+
+    document.addEventListener('click', (e) => {
+        if(document.activeElement.className !== 'app-container') {
+          const titleInput = self.shadowRoot.querySelector('.card-title');
+          titleInput.classList.remove('error');
+        }
     })
 
 }
