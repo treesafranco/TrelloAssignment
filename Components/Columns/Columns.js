@@ -1,196 +1,114 @@
-class Column extends HTMLElement {
+class Columns extends HTMLElement {
     constructor() {
     super();
     this.db = new appDatabase();
 
     var shadowRoot = this.attachShadow({mode: 'open'});
 
-    var template = document.getElementById('column-template').content;
+    var template = document.getElementById('columns-template').content;
     shadowRoot.appendChild(template.cloneNode(true));
-    }   
-    
-    get id() {
-        return  this.getAttribute('id');
-      }
-  
-    set id(id) {
-        this.setAttribute('value', id);
+
+    var columns = shadowRoot.querySelector('.columns');
     }
 
-    get cards() {
+    get list() {
         return this._list;
       }
   
-    set cards(list) {
+    set list(list) {
         this._list = list;
         this.render();
     }
 
     render() {
-        let cardElement = this.shadowRoot.querySelector('.cards');
-        cardElement.innerHTML = '';
+        let ulElement = this.shadowRoot.querySelector('.columns');
+        ulElement.innerHTML = '';
       
-        this.cards.forEach(cd => {
-            if(cd.columnId === parseInt(this.id)) {
-                let card = _createCardElement(this, cd);
-                cardElement.appendChild(card);
-            }
+        this.list.forEach(col => {
+          let column = _createColumnElement(this, col);
+          ulElement.appendChild(column);
         });
       }
 
-    connectedCallback() {
-        // remove a column
-        const removeButton = this.shadowRoot.querySelector('.column-remove');
-        removeButton.addEventListener('click', (e) => {       
-            let event = new CustomEvent("ColumnRemoved", {
-                detail: {
-                    columnId: this.id
-                },
-                bubbles: true
-                });
-
-            this.dispatchEvent(event); 
-        });
-
-        // modify a column title
-        const titleInput = this.shadowRoot.querySelector('.column-modify');
-        titleInput.addEventListener('change', (e) => {
-            let event = new CustomEvent("ColumnModified", {
-                detail: {
-                    columnId: this.id,
-                    columnTitle: e.target.value
-                },
-                bubbles: true
-            });
-
-            this.dispatchEvent(event); 
-        });
-
-        // add a new card
-        const addCardButton = this.shadowRoot.querySelector('.add-card');
-        addCardButton.addEventListener('click', (e) => {
-            const titleInput = this.shadowRoot.querySelector('.card-title');
-            const title = titleInput.value;
-            const description = "";
-
-            let uniqueTitle = true;
-            let id = this.id + '_' + title;
-            this.cards.map(item => {
-                if(item.title == title) {
-                    uniqueTitle = false;
-                }
-            });
-            
-            if(title && uniqueTitle) {
-                titleInput.classList.remove('error');
-                let data = { id: id, title: title, description: description, columnId: parseInt(this.id)}
-                _addCard(this, data);
-            } else {
-                titleInput.classList.add('error');
-            }
-
-
-
-        });
-
-        const addCard = this.shadowRoot.querySelector('.card-title');
-        addCard.addEventListener('click', (e) => {
-            let refreshEvent = new CustomEvent("refreshList", {
-                detail: {},
-                bubbles: true,
-                cancelable: false
-            });
-            this.dispatchEvent(refreshEvent);
-        });
-
-        _fetchCards(this);
-        _attachCardEventListener(this);
-    }
-    
+      connectedCallback() {
+        _attachEventListener(this);
+      }
 }
 
-function _attachCardEventListener(self) {
-  
-    // remove card
-    self.shadowRoot.addEventListener('CardRemoved', (e) => {
-      _removeCard(self, e.detail.cardId);
+  function _attachEventListener(self) {
+
+    self.shadowRoot.addEventListener('ColumnRemoved', (e) => {
+      _removeColumn(self, e.detail.columnId);
     })
-    
-    // edit card
-    self.shadowRoot.addEventListener('CardModified', (e) => {
-        let title = e.detail.title;
-        let uniqueTitle = true;
-        let data = {
-            title: title,
-            description: e.detail.description
+
+    self.shadowRoot.addEventListener('ColumnModified', (e) => {
+      const id = parseInt(e.detail.columnId);
+      const data = {
+        title: e.detail.columnTitle
+      }
+      let uniqueTitle = true;
+
+      // checking if unique title and id
+      self.list.map((item) => {
+        if(item.title === data.title) {
+          uniqueTitle = false;
         }
+      });
 
-        self.cards.map(item => {
-            if(item.title == title && item.id != e.detail.id) {
-                uniqueTitle = false;
-            }
-        });
+      if(uniqueTitle) {
+        _modifyColumns(self, id, data);
+      } 
+    });
 
-        if(title && uniqueTitle) {
-            _modifyCard(self, e.detail.id, data);
-        }
-    })
+  }
 
-    self.shadowRoot.addEventListener('refreshList', (e) => {
-        _fetchCards(self);
-    })
+  function _createColumnElement(self, col) {
+    var column = document.createElement('app-column');
 
-    document.addEventListener('click', (e) => {
-        if(document.activeElement.className !== 'app-container') {
-          const titleInput = self.shadowRoot.querySelector('.card-title');
-          titleInput.classList.remove('error');
-        }
-    })
+    column.setAttribute('id',col.id);
+    column.setAttribute('class', "app-column");
 
-}
+    var input = document.createElement('input');
+    input.setAttribute('slot', 'column-title');
+    input.value = col.title;
 
-function _fetchCards(self) {
-    self.db.fetchFromDatabase(cardUrl, _fetchCardsCallback, [self]);
-}
+    column.appendChild(input);
+     
+    return column;
+  }
 
-function _fetchCardsCallback(self, data) {
+  function _removeColumn(self, id) {
+    const url = colUrl+ '/' + id;
+    self.db.removeFromDatabase(url, _removeColumnCallback , [self])
+  }
+
+  function _removeColumnCallback(self) {
+    _fetchColumns(self);
+    _deleteColumnCards(self);
+  }
+
+  function _deleteColumnCards(self, id) {
+    const column = self.shadowRoot.querySelector('.app-column');
+    const cardList = column.cards;
+    cardList.map(item => {
+      if(item.columnId == id) {
+        self.db.removeFromDatabase(url, null, null)
+      }
+    });
+  }
+
+  function _fetchColumns(self) {
+    self.db.fetchFromDatabase(colUrl, _fetchColumnsCallbback, [self]);
+  }
+
+  function _fetchColumnsCallbback(self, data) {
     const list = data;
-    self.cards = list;
-}
+    self.list = list;
+  }
 
-function _createCardElement(self, item) {
-    var card = document.createElement('app-card');
+  function _modifyColumns(self, id, data) {
+    self.db.modifyDataInDatabase(colUrl + '/' + id, data, null, null);
+  }
 
-    card.setAttribute('id',item.id);
-    card.setAttribute('colId', item.columnId);
-    card.setAttribute('title', item.title);
-    card.setAttribute('description', item.description);
-    card.setAttribute('class', "app-card");
 
-    var cardHeader = document.createElement('span');
-    cardHeader.setAttribute('slot', 'card-header');
-    cardHeader.textContent = item.title;
- 
-    card.appendChild(cardHeader);
-    
-    return card;
-}
-
-function _addCard(self, data) {
-    self.db.addToDatabase(cardUrl, data, _addCardCallback, [self]);
-}
-
-function _addCardCallback(self) {
-    self.shadowRoot.querySelector('input.card-title').value = "";
-    _fetchCards(self);
-}
-
-function _removeCard(self, id) {
-    self.db.removeFromDatabase(cardUrl+ '/' + id, _fetchCards, [self]);
-}
-
-function _modifyCard(self, id, data) {
-    self.db.modifyDataInDatabase(cardUrl + '/' + id, data, _fetchCards, [self]);
-}
-
-customElements.define('app-column', Column);
+customElements.define('app-columns', Columns);
