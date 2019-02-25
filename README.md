@@ -1,6 +1,6 @@
 # TrelloApp
 
-A simple Task Board Application. Users can Add, Edit, Remove Columns and Cards to the Dashboard.
+A simple Task Board Application similar to Trello. Users can Add, Edit, Remove Columns and Cards to the Dashboard.
 
 Please follow the below stepps to successfully run this application.
 
