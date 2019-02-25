@@ -18,6 +18,7 @@ class Container extends HTMLElement {
 
     onClickAddColumn(e) {
       const titleInput = this.shadowRoot.querySelector('.column-title');
+     
       const title = titleInput.value;
       let uniqueTitle = true;
       let id = 0;
@@ -30,9 +31,13 @@ class Container extends HTMLElement {
       });
 
       if(title && uniqueTitle) {
+        titleInput.classList.remove('error');
         let data = { id: id + 1, title: title}
         _addColumn(this, data);
+      } else {
+        titleInput.classList.add('error');
       }
+
     }
 
     connectedCallback() {
@@ -47,9 +52,14 @@ class Container extends HTMLElement {
         const searchVal = document.getElementById('search-form').value;
         this.db.fetchFromDatabase(colUrl + '?q=' + searchVal, _fetchCloumnCallbackList, [this]);
       });
+
+      document.addEventListener('click', (e) => {
+        if(document.activeElement.className !== 'app-container') {
+          const titleInput = this.shadowRoot.querySelector('.column-title');
+          titleInput.classList.remove('error');
+        }
+      })
     } 
-
-
 }
 
 function _fetchAndPopulateColumns(self) {
@@ -71,10 +81,5 @@ function _addColumnCallback(self) {
   self.shadowRoot.querySelector('input.column-title').value = "";
   _fetchAndPopulateColumns(self);
 }
-
-
-
-
-
 
 customElements.define('app-container', Container);
