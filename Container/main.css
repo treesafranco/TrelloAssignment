@@ -19,13 +19,7 @@ header h2 {
     margin: 0;
 }
 
-#search {
-    margin-top: 10px;
-}
 
-#search-form {
-    border: 0;
-}
 
 @media (max-width: 480px) {
     .app-container,
