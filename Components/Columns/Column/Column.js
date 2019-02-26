@@ -48,8 +48,12 @@ class Column extends HTMLElement {
             }
         });
 
+        //update UI based on search
         if(cardCount === 0 && this.searchInput) {
-            this.remove();
+            console.log(this.style.display);
+            this.style.display = 'none';
+        } else {
+            this.style.display = 'block';
         }
       }
 
@@ -104,9 +108,6 @@ class Column extends HTMLElement {
             } else {
                 titleInput.classList.add('error');
             }
-
-
-
         });
 
         const addCard = this.shadowRoot.querySelector('.card-title');
