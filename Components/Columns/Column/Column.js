@@ -26,16 +26,31 @@ class Column extends HTMLElement {
         this.render();
     }
 
+    get searchInput() {
+        return this._searchInput;
+    }
+
+    set searchInput(value) {
+        this._searchInput = value;
+    }
+
+
     render() {
         let cardElement = this.shadowRoot.querySelector('.cards');
         cardElement.innerHTML = '';
-      
+
+        let cardCount = 0;
         this.cards.forEach(cd => {
             if(cd.columnId === parseInt(this.id)) {
+                cardCount ++;
                 let card = _createCardElement(this, cd);
                 cardElement.appendChild(card);
             }
         });
+
+        if(cardCount === 0 && this.searchInput) {
+            this.remove();
+        }
       }
 
     connectedCallback() {
@@ -50,6 +65,7 @@ class Column extends HTMLElement {
                 });
 
             this.dispatchEvent(event); 
+            this.remove();
         });
 
         // modify a column title
@@ -147,6 +163,11 @@ function _attachCardEventListener(self) {
         }
     })
 
+    document.addEventListener('Search', (e) => {
+        const data = e.detail.result;
+        self.searchInput = e.detail.input;
+        _fetchCardsCallback(self, data)
+    });
 }
 
 function _fetchCards(self) {
