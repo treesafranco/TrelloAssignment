@@ -1,6 +1,7 @@
 <html>
     <head>
         <script src="db.js" defer/></script>
+        <script src="../Components/Search/Search.js" defer></script>
         <script src="../Components/Columns/Column/Column.js" defer/></script>
         <script src="../Components/Columns/Columns.js" defer></script>
         <script src="../Components/Card/Card.js" defer></script>
@@ -9,13 +10,26 @@
 
     </head>
     <body>
-        <header>
+        <header id="headerr">
             <h2>Welcome to your Trello Board!</h2>
+            <app-search id="app-search"></app-search>
+        </header>
+        
+        <template id="search-template">
+            <style>
+                #search {
+                    margin-top: 10px;
+                }
+
+                #search-form {
+                    border: 0;
+                }
+            </style>
             <div id="search">
                 <input id="search-form" type="text"></input>
                 <button id="search-col">Search</button>
             </div>
-        </header>
+        </template>
 
         <template id="container-template">
             <style>
