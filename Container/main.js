@@ -46,13 +46,6 @@ class Container extends HTMLElement {
       addColumn.addEventListener('click', this.onClickAddColumn, false);
       _fetchAndPopulateColumns(this);
 
-      //search column
-      const search = document.getElementById('search');
-      search.addEventListener('click', (e) => {
-        const searchVal = document.getElementById('search-form').value;
-        this.db.fetchFromDatabase(colUrl + '?q=' + searchVal, _fetchCloumnCallbackList, [this]);
-      });
-
       document.addEventListener('click', (e) => {
         if(document.activeElement.className !== 'app-container') {
           const titleInput = this.shadowRoot.querySelector('.column-title');
