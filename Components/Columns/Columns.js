@@ -7,8 +7,6 @@ class Columns extends HTMLElement {
 
     var template = document.getElementById('columns-template').content;
     shadowRoot.appendChild(template.cloneNode(true));
-
-    var columns = shadowRoot.querySelector('.columns');
     }
 
     get list() {
@@ -28,6 +26,7 @@ class Columns extends HTMLElement {
           let column = _createColumnElement(this, col);
           ulElement.appendChild(column);
         });
+
       }
 
       connectedCallback() {
@@ -83,7 +82,6 @@ class Columns extends HTMLElement {
   }
 
   function _removeColumnCallback(self) {
-    _fetchColumns(self);
     _deleteColumnCards(self);
   }
 
@@ -98,6 +96,8 @@ class Columns extends HTMLElement {
   }
 
   function _fetchColumns(self) {
+    const searchInput =  document.getElementById('app-search').shadowRoot.querySelector('#search-form');
+    searchInput.value = "";
     self.db.fetchFromDatabase(colUrl, _fetchColumnsCallbback, [self]);
   }
 
